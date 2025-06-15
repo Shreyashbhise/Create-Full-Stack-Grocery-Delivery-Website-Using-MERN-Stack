@@ -1,23 +1,35 @@
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../context/AppConext'
-import { dummyOrders } from '../assets/assets'
+
 
 const MyOrders = () => {  
 
     const [myOrders,setMyOrders] = useState([])
-    const {currency} = useAppContext()
+    const {currency, axios, user} = useAppContext()
 
     const fetchMyOrders = async ()=>{
-        setMyOrders(dummyOrders)
+        try {
+            const {data} = await axios.get('/api/order/user' );
+            if(data.success){
+                setMyOrders(data.orders)
+            }
+        } catch (error) { 
+            console.log(error);
+            
+        }
     }
     useEffect(()=>{
-        fetchMyOrders()
-    },[])
+        if(user){
+            
+            fetchMyOrders()
+        }
+    },[user])
+
     return (
         <div className='mt-16 pb-16'>
             <div className='flex flex-col items-end w-max mb-8'>
                 <p className='text-2xl font-medium uppercase'>My orders</p>
-                <div className='w-16 h-0.5 bg-pink-400 rounded full'></div>
+                <div className='w-16 h-0.5 bg-pink-400 rounded-full'></div>
             </div> 
             {myOrders.map((order,index)=>(
                 <div key={index} className='border border-gray-300 rounded-lg mb-10 p-4 py-5
@@ -42,7 +54,7 @@ const MyOrders = () => {
                                 </div>
                             </div>
                             <div className='flex flex-col justify-center md:ml-8 mb-4 md:mb-0'>
-                                <p>Qantity: {item.quantity || "1"}</p>
+                                <p>Quantity: {item.quantity || "1"}</p>
                                 <p>Status: {order.status}</p>
                                 <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
                             </div>

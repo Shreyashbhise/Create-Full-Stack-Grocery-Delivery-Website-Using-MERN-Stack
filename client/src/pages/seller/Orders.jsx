@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../../context/AppConext'
 import { assets, dummyOrders } from '../../assets/assets'
+import toast from 'react-hot-toast'
 
 const Orders = () => {
-    const { currency } = useAppContext()
+    const { currency, axios } = useAppContext()
     const [orders, setOrders] = useState([])
 
     const fetchOrders = async () => {
-        setOrders(dummyOrders)
+        try {
+            const {data} = await axios.get('/api/order/seller');
+            if(data.success){
+                setOrders(data.order)
+            }else {
+                toast.error(data.message)
+            }
+            
+        } catch (error) { 
+            toast.error(error.message)
+            
+        }
     };
 
     useEffect(() => {
-        fetchOrders
+        fetchOrders();
     }, [])
     return (
         <div className='no-scrollbar flex-1 h-[95vh] overflow-y-scroll'>
